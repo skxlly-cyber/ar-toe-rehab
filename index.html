@@ -27,8 +27,9 @@
         <!-- AR Marker - Using Hiro preset for instant testing -->
         <a-marker id="marker" preset="hiro" smooth="true" smoothCount="10" smoothTolerance="0.01" smoothThreshold="5">
 
-            <!-- Basket (player) -->
-            <a-box id="basket" position="0 0 0" scale="0.15 0.08 0.15" color="#FFD700" material="opacity: 0.8">
+            <!-- Basket (player) - Made larger and more visible -->
+            <a-box id="basket" position="0 0.05 0" scale="0.25 0.12 0.25" color="#FFD700"
+                material="shader: flat; side: double; transparent: false" visible="true">
             </a-box>
 
             <!-- Fruit spawn area (invisible) -->
