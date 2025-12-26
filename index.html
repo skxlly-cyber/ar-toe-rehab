@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Toe Grip Rehab</title>
+
+    <!-- A-Frame for 3D/VR -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+    <!-- AR.js for marker tracking -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- AR Scene -->
+    <a-scene embedded
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; precision: medium;">
+
+        <!-- Camera -->
+        <a-entity camera></a-entity>
+
+        <!-- AR Marker - Using Hiro preset for instant testing -->
+        <a-marker id="marker" preset="hiro" smooth="true" smoothCount="10" smoothTolerance="0.01" smoothThreshold="5">
+
+            <!-- Basket (player) -->
+            <a-box id="basket" position="0 0 0" scale="0.15 0.08 0.15" color="#FFD700" material="opacity: 0.8">
+            </a-box>
+
+            <!-- Fruit spawn area (invisible) -->
+            <a-entity id="game-anchor"></a-entity>
+        </a-marker>
+    </a-scene>
+
+    <!-- UI Overlay -->
+    <div id="ui-container">
+        <!-- Waiting Panel -->
+        <div id="waiting-panel" class="panel active">
+            <h1>🦶 AR Toe Grip Rehab</h1>
+            <p>Point your camera at the marker to begin</p>
+            <div class="pulse-indicator"></div>
+        </div>
+
+        <!-- Calibration Panel -->
+        <div id="calibration-panel" class="panel">
+            <h2>Calibration</h2>
+            <p>Hold your toe in a relaxed, neutral position</p>
+            <div class="progress-container">
+                <div id="calibration-progress" class="progress-bar"></div>
+            </div>
+            <p id="calibration-text">0%</p>
+        </div>
+
+        <!-- Game HUD -->
+        <div id="game-hud" class="panel">
+            <div class="hud-top">
+                <div class="stat-box">
+                    <span class="label">Score</span>
+                    <span id="score" class="value">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="label">Time</span>
+                    <span id="time" class="value">3:00</span>
+                </div>
+            </div>
+
+            <div class="hud-middle">
+                <div id="combo-text" class="combo"></div>
+            </div>
+
+            <div class="hud-bottom">
+                <div class="curl-meter">
+                    <div class="label">Toe Curl</div>
+                    <div class="meter-container">
+                        <div id="curl-fill" class="meter-fill"></div>
+                    </div>
+                    <div id="curl-percent" class="value">0%</div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <span class="label">Reps:</span>
+                        <span id="reps" class="value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="label">Hold:</span>
+                        <span id="hold-time" class="value">0.0s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Panel -->
+        <div id="gameover-panel" class="panel">
+            <h2>🎉 Session Complete!</h2>
+            <div class="final-stats">
+                <div class="stat-item">
+                    <span class="label">Final Score:</span>
+                    <span id="final-score" class="value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">Total Reps:</span>
+                    <span id="final-reps" class="value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">Max Hold:</span>
+                    <span id="final-hold" class="value">0.0s</span>
+                </div>
+            </div>
+            <button id="restart-btn" class="btn">Play Again</button>
+        </div>
+
+        <!-- Achievement Popup -->
+        <div id="achievement" class="achievement">
+            <span id="achievement-text"></span>
+        </div>
+    </div>
+
+    <!-- Game Logic -->
+    <script src="game.js"></script>
+</body>
+
+</html>
