@@ -316,13 +316,15 @@ class ToeGripGame {
         ];
         const fruitType = fruitTypes[Math.floor(Math.random() * fruitTypes.length)];
 
-        // Create fruit entity
+        // Create fruit entity - Made larger and more visible
         const fruit = document.createElement('a-sphere');
-        fruit.setAttribute('radius', '0.04');
+        fruit.setAttribute('radius', '0.08'); // Doubled size
         fruit.setAttribute('color', fruitType.color);
+        fruit.setAttribute('material', 'shader: flat; side: double');
+        fruit.setAttribute('visible', 'true');
         fruit.setAttribute('position', {
-            x: (Math.random() - 0.5) * 0.2,
-            y: 0.3,
+            x: (Math.random() - 0.5) * 0.3,
+            y: 0.4,
             z: 0
         });
 
@@ -333,14 +335,14 @@ class ToeGripGame {
         this.fruits.push({
             element: fruit,
             points: fruitType.points,
-            fallSpeed: 0.15 + (Math.random() * 0.1),
+            fallSpeed: 0.12 + (Math.random() * 0.08), // Slower fall
             spawnTime: Date.now()
         });
     }
 
     updateFruits(deltaTime) {
         const basketPos = this.basket.getAttribute('position');
-        const basketSize = 0.15;
+        const basketSize = 0.25; // Updated to match new basket size
 
         for (let i = this.fruits.length - 1; i >= 0; i--) {
             const fruit = this.fruits[i];
@@ -363,7 +365,7 @@ class ToeGripGame {
                 this.fruits.splice(i, 1);
             }
             // Check if missed (fell below)
-            else if (pos.y < -0.3) {
+            else if (pos.y < -0.4) {
                 this.onFruitMissed(fruit);
                 fruit.element.parentNode.removeChild(fruit.element);
                 this.fruits.splice(i, 1);
