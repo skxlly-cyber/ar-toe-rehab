@@ -18,8 +18,9 @@
 <body>
     <!-- AR Scene -->
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; 
-              sourceWidth: 1280; sourceHeight: 960; displayWidth: 1280; displayHeight: 960;"
-        vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; precision: medium;">
+              sourceWidth: 1280; sourceHeight: 960; displayWidth: 1280; displayHeight: 960;
+              videoTexture: true;" vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true; precision: high; antialias: true;">
 
         <!-- Camera -->
         <a-entity camera></a-entity>
@@ -120,6 +121,116 @@
             <span id="achievement-text"></span>
         </div>
     </div>
+
+    <!-- Camera Enhancement Script -->
+    <script>
+        // Enhanced camera settings with autofocus control
+        (function () {
+            let videoElement = null;
+            let videoTrack = null;
+
+            // Override getUserMedia for better quality
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                const originalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+
+                navigator.mediaDevices.getUserMedia = function (constraints) {
+                    // Override constraints for better quality
+                    if (constraints && constraints.video) {
+                        constraints.video = {
+                            facingMode: { ideal: 'environment' }, // Force rear camera
+                            width: { ideal: 1280, min: 640 },
+                            height: { ideal: 960, min: 480 },
+                            aspectRatio: { ideal: 4 / 3 },
+                            frameRate: { ideal: 30, min: 24 }
+                        };
+                    }
+
+                    return originalGetUserMedia(constraints).then(stream => {
+                        // Store video track for later focus control
+                        videoTrack = stream.getVideoTracks()[0];
+
+                        // Apply advanced camera settings if supported
+                        if (videoTrack && videoTrack.getCapabilities) {
+                            const capabilities = videoTrack.getCapabilities();
+                            const constraints = {};
+
+                            // Enable continuous autofocus if supported
+                            if (capabilities.focusMode && capabilities.focusMode.includes('continuous')) {
+                                constraints.focusMode = 'continuous';
+                            }
+
+                            // Set optimal focus distance if supported
+                            if (capabilities.focusDistance) {
+                                constraints.focusDistance = capabilities.focusDistance.max * 0.3; // 30% of max range
+                            }
+
+                            // Enable continuous exposure if supported
+                            if (capabilities.exposureMode && capabilities.exposureMode.includes('continuous')) {
+                                constraints.exposureMode = 'continuous';
+                            }
+
+                            // Enable continuous white balance if supported
+                            if (capabilities.whiteBalanceMode && capabilities.whiteBalanceMode.includes('continuous')) {
+                                constraints.whiteBalanceMode = 'continuous';
+                            }
+
+                            // Apply constraints
+                            if (Object.keys(constraints).length > 0) {
+                                videoTrack.applyConstraints({ advanced: [constraints] }).catch(err => {
+                                    console.log('Some camera constraints not supported:', err);
+                                });
+                            }
+                        }
+
+                        return stream;
+                    });
+                };
+            }
+
+            // Add tap-to-focus functionality
+            window.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    // Find the video element created by AR.js
+                    videoElement = document.querySelector('video');
+
+                    if (videoElement) {
+                        // Add click/touch handler for manual focus
+                        document.addEventListener('click', triggerFocus);
+                        document.addEventListener('touchstart', triggerFocus);
+
+                        console.log('✅ Camera enhancement active - Tap screen to focus');
+                    }
+                }, 2000); // Wait for AR.js to initialize
+            });
+
+            function triggerFocus(event) {
+                if (!videoTrack) return;
+
+                try {
+                    // Try to trigger autofocus by toggling focus mode
+                    if (videoTrack.getCapabilities && videoTrack.getCapabilities().focusMode) {
+                        const capabilities = videoTrack.getCapabilities();
+
+                        // Toggle between manual and continuous to trigger refocus
+                        if (capabilities.focusMode.includes('manual')) {
+                            videoTrack.applyConstraints({
+                                advanced: [{ focusMode: 'manual' }]
+                            }).then(() => {
+                                // Switch back to continuous after a brief moment
+                                setTimeout(() => {
+                                    videoTrack.applyConstraints({
+                                        advanced: [{ focusMode: 'continuous' }]
+                                    }).catch(err => console.log('Focus toggle error:', err));
+                                }, 100);
+                            }).catch(err => console.log('Focus trigger error:', err));
+                        }
+                    }
+                } catch (err) {
+                    console.log('Focus control not supported:', err);
+                }
+            }
+        })();
+    </script>
 
     <!-- Game Logic -->
     <script src="game.js"></script>
