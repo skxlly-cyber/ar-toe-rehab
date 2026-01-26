@@ -25,8 +25,8 @@
         <!-- Camera -->
         <a-entity camera></a-entity>
 
-        <!-- AR Marker - Using Hiro preset for instant testing -->
-        <a-marker id="marker" preset="hiro" smooth="true" smoothCount="10" smoothTolerance="0.01" smoothThreshold="5">
+        <!-- AR Marker - Using Hiro preset with optimized detection -->
+        <a-marker id="marker" preset="hiro" smooth="true" smoothCount="5" smoothTolerance="0.01" smoothThreshold="2">
 
             <!-- Basket (player) - Made larger and more visible -->
             <a-box id="basket" position="0 0.05 0" scale="0.25 0.12 0.25" color="#FFD700"
